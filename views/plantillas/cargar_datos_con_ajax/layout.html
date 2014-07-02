@@ -1,0 +1,134 @@
+{% extends 'layout_tutos.html' %}
+
+
+{% block modales %}
+<div class="modal fade" id="registroLista" tabindex="-1" role="dialog" aria-labelledby="registroLista" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="registroListaTitle">Editar Lista</h4>
+      </div>
+      <div class="modal-body">
+        <form role="form" action="action=setRegistro" name="formUpdate" id="formUpdate">
+          <fieldset id="ocultos">
+            <input type="hidden" id="id_lista" name="id_lista" value="">
+          </fieldset>
+          <div class="form-group">
+        <label for="lista_lenguaje">Lenguaje</label>
+        <input type="text" class="form-control" id="lista_lenguaje" name="lista_lenguaje" placeholder="Nombre del lenguaje" required maxlength="80"/>
+      </div>
+      <div class="form-group">
+        <label for="lista_funcion">Función</label>
+        <input type="text" class="form-control" id="lista_funcion" name="lista_funcion" placeholder="Función del lenguaje" required maxlength="120" />
+      </div>
+      <div class="form-group">
+        <label for="lista_descripcion">Descripción</label>
+        <textarea name="lista_descripcion" id="lista_descripcion" class="form-control" placeholder="Descripción de la función"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="lista_tips">Tips</label>
+        <textarea name="lista_tips" id="lista_tips" class="form-control" placeholder="Tips de uso de la función"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Actualuzar</button>
+    </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block contenido %}
+<ol class="breadcrumb">
+  <li><a href="{{ root }}">Tutoriales</a></li>
+  <li class="active">Llenar Formulario AJAX</li>
+</ol>
+
+<div class="panel panel-default">
+
+  <div class="panel-heading">Descripción</div>
+  <div class="panel-body">
+    <p>En este tutorial aprenderemos a ejecutar mediante jQuery ajax consultas a una base de datos con php que nos permitiran llenar un formulario</p>
+    <p>- La petición ajax envía datos de tipo POST y recibe información en formato JSON</p>
+  </div>
+
+  <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Lenguaje</th>
+            <th>Función</th>
+            <th>Descripción</th>
+            <th>Tips</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="listaRegFunciones">
+        {% for lista in lista_funciones %}
+          <tr>
+            <td>{{ lista.id_lista }}</td>
+            <td>{{ lista.lista_lenguaje }}</td>
+            <td><code>{{ lista.lista_funcion }}</code></td>
+            <td>{{ lista.lista_descripcion }}</td>
+            <td>{{ lista.lista_tips }}</td>
+            <td style="text-align:center;"><a href="#" class="btn btn-default btn-xs" data-id_lista="{{lista.id_lista}}"> <span class="glyphicon glyphicon-pencil"></span> Editar</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block javascripts %}
+<script>
+  $(function(){
+    $('body').on('click', '#listaRegFunciones a', function(event) {
+      event.preventDefault();
+
+      var id_lista = $(this).attr('data-id_lista');
+
+      // ejecutamos ajax para extraer los datos de la función
+      $.ajax({
+        url: 'actions.inc.php',
+        type: 'POST',
+        dataType: 'json',
+        data: "action=getFuncion&id_lista=" + id_lista,
+        cache:false
+      })
+      .done(function(response) {
+        if(response.result == true){
+
+          $('#lista_lenguaje').val(response.datos.lista_lenguaje);
+          $('#lista_funcion').val(response.datos.lista_funcion);
+          $('#lista_descripcion').val(response.datos.lista_descripcion);
+          $('#lista_tips').val(response.datos.lista_tips);
+          $('#id_lista').val(response.datos.id_lista);
+          
+
+          $('#registroLista').modal('show');
+
+        }else{
+          alert(response.mensaje);
+        }
+
+      })
+      .fail(function() {
+        console.log("error");
+      })
+      .always(function() {
+        console.log("complete");
+      });
+
+      
+    });
+    
+  });
+</script>
+{% endblock %}

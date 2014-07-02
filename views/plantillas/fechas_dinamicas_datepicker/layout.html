@@ -1,0 +1,71 @@
+{% extends 'layout_tutos.html' %}
+
+{% block css_extra %}{% endblock %}
+
+
+{% block modales %}{% endblock %}
+
+
+{% block contenido %}
+<ol class="breadcrumb">
+  <li><a href="{{ root }}">Tutoriales</a></li>
+  <li class="active">Fechas dinámicas con jQuery Datepicker</li>
+</ol>
+
+<div class="panel panel-default">
+
+  <div class="panel-heading">Descripción</div>
+  <div class="panel-body">
+    <p>En este tutorial aprenderemos a crear campos de tipo fecha dinámicos</p>
+    <p>- Utilizando jquery ui y javascript.</p>
+  </div>
+</div>
+<div class="row">
+  	<div class="col-sm-6">
+	  	<form role="form" action="action=setFuncion" name="formAddRegistro" id="formAddRegistro">
+	       <div class="row">
+            <div class="col-md-6">
+              <label for="search_fecha_inicial">Fecha de Llegada</label>
+              <input type="text" class="form-control" name="search_fecha_inicial" id="search_fecha_inicial" placeholder="0000-00-00" maxlength="10" value="{{ fechaInicio }}" required />
+            </div>
+            <div class="col-md-6">
+              <label for="search_fecha_final">Fecha de Salida</label>
+              <input type="text" class="form-control" name="search_fecha_final" id="search_fecha_final" placeholder="0000-00-00" maxlength="10" value="{{ fechaFinal }}" required />
+            </div>
+          </div>
+		  </form>
+	  </div>
+  </div>
+{% endblock %}
+
+
+{% block javascripts %}
+
+<!-- jquery validate -->
+<script src="{{ root }}libs/javascript/jquery.validate.js"></script>
+<!-- jquery validate lenguajes-->
+<script src="{{ root }}libs/javascript/localization/messages_es.js"></script>
+
+<script>
+  $(function(){
+
+    $('#search_fecha_inicial').datepicker({
+                                            dateFormat: "dd-mm-yy",
+                                            minDate: 1,
+                                            onSelect:function(selectedDate){
+                                              
+                                              $('#search_fecha_final').val(selectedDate);
+
+                                              var fechaSeparada = selectedDate.split("-");
+
+                                              $('#search_fecha_final').datepicker("option", "minDate", new Date(fechaSeparada[2], parseInt(fechaSeparada[1]) - 1, parseInt(fechaSeparada[0])+1 ));
+                                            }
+    });
+
+    $('#search_fecha_final').datepicker({
+                                            dateFormat: "dd-mm-yy",
+                                            minDate: 1});
+
+    });
+</script>
+{% endblock %}

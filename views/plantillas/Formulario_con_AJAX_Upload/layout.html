@@ -1,0 +1,170 @@
+{% extends 'layout_tutos.html' %}
+
+{% block css_extra %}
+<link rel="stylesheet" href="{{ root }}views/css/jquery_file_upload/jquery.fileupload.css">
+
+<style>
+	.error{
+        font-size: 0.9em;
+        color: #ED2541;
+      }
+</style>
+{% endblock %}
+
+
+{% block modales %}{% endblock %}
+
+
+{% block contenido %}
+<ol class="breadcrumb">
+  <li><a href="{{ root }}">Tutoriales</a></li>
+  <li class="active">Formulario con AJAX Upload</li>
+</ol>
+
+<div class="panel panel-default">
+
+  <div class="panel-heading">Descripción</div>
+  <div class="panel-body">
+    <p>En este tutorial aprenderemos a crear un formulario que incluya un upload de archivos con jQuery File Upload y guarde los datos en una tabla por medio de AJAX</p>
+    <p>- La petición ajax envía datos de tipo POST y recibe información en formato JSON</p>
+  </div>
+</div>
+<div class="row">
+  	<div class="col-sm-6">
+	  	<form role="form" action="action=setFuncion" name="formAddRegistro" id="formAddRegistro">
+	  	  <div class="form-group">
+		    <label for="lista_archivo">Archivo</label>
+		    <input type="text" class="form-control" id="lista_archivo" name="lista_archivo" placeholder="Nombre del archivo" required maxlength="80" readonly />
+		  </div>
+		  <div class="form-group">
+		    <label for="lista_lenguaje">Lenguaje</label>
+		    <input type="text" class="form-control" id="lista_lenguaje" name="lista_lenguaje" placeholder="Nombre del lenguaje" required maxlength="80"/>
+		  </div>
+		  <div class="form-group">
+		    <label for="lista_funcion">Función</label>
+		    <input type="text" class="form-control" id="lista_funcion" name="lista_funcion" placeholder="Función del lenguaje" required maxlength="120" />
+		  </div>
+		  <div class="form-group">
+		    <label for="lista_descripcion">Descripción</label>
+		    <textarea name="lista_descripcion" id="lista_descripcion" class="form-control" placeholder="Descripción de la función" required maxlength="120"></textarea>
+		  </div>
+		  <div class="form-group">
+		    <label for="lista_tips">Tips</label>
+		    <textarea name="lista_tips" id="lista_tips" class="form-control" placeholder="Tips de uso de la función" required maxlength="120"></textarea>
+		  </div>
+		  <span class="btn btn-success fileinput-button">
+			<i class="glyphicon glyphicon-plus"></i>
+			<span id="btn-txt">Adjuntar archivo...</span>
+			<!-- The file input field used as target for the file upload widget -->
+			<input id="fileupload" type="file" name="files[]" multiple>
+		  </span>
+			<br>
+			<br>
+			<!-- The global progress bar -->
+			<div id="progress" class="progress">
+			<div class="progress-bar progress-bar-success"></div>
+			</div>
+			<!-- The container for the uploaded files -->
+			<div id="files" class="files"></div>
+		  <button type="submit" class="btn btn-primary">Actualuzar</button>
+		</form>
+	  </div>
+  </div>
+{% endblock %}
+
+
+{% block javascripts %}
+<!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
+<script src="{{ root }}libs/php/jQuery-File-Upload-9.5.7/js/vendor/jquery.ui.widget.js"></script>
+<!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+<script src="{{ root }}libs/php/jQuery-File-Upload-9.5.7/js/jquery.iframe-transport.js"></script>
+<!-- The basic File Upload plugin -->
+<script src="{{ root }}libs/php/jQuery-File-Upload-9.5.7/js/jquery.fileupload.js"></script>
+
+<!-- jquery validate -->
+<script src="{{ root }}libs/javascript/jquery.validate.js"></script>
+<!-- jquery validate lenguajes-->
+<script src="{{ root }}libs/javascript/localization/messages_es.js"></script>
+
+<script>
+  $(function(){
+
+    $('#fileupload').fileupload({
+        url: '{{ root }}Formulario_con_AJAX_Upload/actions.inc.php',
+        dataType: 'json',
+        done: function (e, data) {
+
+        	$.each(data.result.files, function (index, file) {
+        		if(!file.error){
+        			$('#files').html('<p><strong>' + file.name + '</strong></p>');
+        			$('#fileupload').hide();
+        			$('#btn-txt').text('Archivo Cargado');
+        			$('#lista_archivo').val(file.name);
+        		}else{
+        			$('#progress .progress-bar').css(
+		                'width',
+		                '0%'
+		            );
+					$('#files').html("<p><strong>El archivo no cumple con los criterios de tamaño o tipo</strong></p>");
+        		}
+	        }); 
+
+        },
+        progressall: function (e, data) {
+            var progress = parseInt(data.loaded / data.total * 100, 10);
+            $('#progress .progress-bar').css(
+                'width',
+                progress + '%'
+            );
+        }
+    }).prop('disabled', !$.support.fileInput).parent().addClass($.support.fileInput ? undefined : 'disabled');
+
+
+    $('#formAddRegistro').validate({
+        submitHandler: function(){
+
+          var action = $('#formAddRegistro').attr('action');
+
+          var formData = $('#formAddRegistro').serialize();
+
+           var dataSave = formData + '&' + action;
+
+           $.ajax({
+             url: '{{ root }}Formulario_con_AJAX_Upload/actions_db.inc.php',
+             type: 'POST',
+             dataType: 'json',
+             data: dataSave,
+             beforeSend:function(){
+              $('#formAddRegistro :input').attr('disabled', 'disabled');
+             }
+           })
+           .done(function(response) {
+             if(response.result == true){
+                
+                $('#formAddRegistro :input').val('');
+                $('#fileupload').show();
+                $('#btn-txt').text('Adjuntar archivo...');
+                $('#files').text('');
+
+             }else{
+              alert(response.mensaje);
+             }
+           })
+           .fail(function() {
+             console.log("error");
+           })
+           .always(function() {
+             $('#formAddRegistro :input').removeAttr('disabled');
+           });
+           
+
+          return false;
+        },
+        errorPlacement: function(error, element) {
+            error.appendTo(element.parent().append());
+        }
+  	});
+
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'layout_tutos.html' %}
+
+{% block css_extra %}{% endblock %}
+
+
+{% block modales %}{% endblock %}
+
+
+{% block contenido %}
+<ol class="breadcrumb">
+  <li><a href="{{ root }}">Tutoriales</a></li>
+  <li class="active">Checkboxes dinámicos con AJAX y PHP</li>
+</ol>
+
+<div class="panel panel-default">
+  <div class="panel-heading">Descripción</div>
+  <div class="panel-body">
+    <p>Pequeño sistema para validación y bloqueo de registros</p>
+    <p>- Utilizando jquery, javascript, php y MySQL.</p>
+  </div>
+  <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Check</th>
+            <th>Pregunta</th>
+          </tr>
+        </thead>
+        <tbody id="listaRegistros">
+        {% for registro in registros %}
+          <tr>
+            <td><input type="checkbox" data-idRegistro="{{ registro.id_registro }}" name="check_" name="check_" value="1" {{ registro.registro_inv <= 5 ? 'disabled="disabled"' : '' }}></td>
+            <td>{{ registro.registro_nombre }} {{ registro.registro_inv <= 5 ? '<span class="label label-warning"><small>agotado</small></span>' : '' }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block javascripts %}
+
+<script>
+  $(function(){
+    // al hacer click en los Checkboxes
+    $('body').on('click', '#listaRegistros input[type=checkbox]', function(event) {
+
+      var idRegistro = $(this).attr('data-idRegistro');
+
+      alert(idRegistro);
+      
+    });
+  });
+</script>
+{% endblock %}
