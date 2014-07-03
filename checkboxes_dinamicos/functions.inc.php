@@ -26,4 +26,25 @@ function getListaRegistros($dbLink){
 	return $response ;
 }
 
+// Verificar disponibilidad
+function verificaDisponibilidad($dbLink,$id_registro){
+	$response = false;
+
+	$consulta = "SELECT registro_inv
+				FROM ajax_checkboxes
+				WHERE id_registro=%d AND registro_inv > 6
+				LIMIT 1";
+
+	$consultaOK = sprintf($consulta,$id_registro);
+
+	// Ejecutamos la cosnulta
+	$respuesta = $dbLink -> query($consultaOK);
+
+	if($respuesta -> num_rows != 0){
+		$response = true;
+	}
+
+	return $response ;
+}
+
 ?>

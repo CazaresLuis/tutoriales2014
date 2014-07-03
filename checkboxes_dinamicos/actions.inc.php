@@ -30,7 +30,31 @@ if(isset($_POST) && !empty($_POST)){
 	if($errorDbConexion){
 
 		// verificamos la accion que vamos a ejecutar
-		if(isset($_POST['action'])){
+		if(isset($_POST['action']) && isset($_POST['id_registro'])){
+			// validar accion
+			if($_POST['action'] == 'setBloqueo'){
+
+				if($_POST['inventario'] == 'ok'){
+
+					$disponibilidad = verificaDisponibilidad($mysqli,$_POST['id_registro']);
+
+					$response = array(
+						"result" 	=> true,
+						"mensaje"	=> "Verificación",
+						"datos"		=> $disponibilidad
+					);
+
+				}else{
+					$response = array(
+						"result" 	=> true,
+						"mensaje"	=> "Verificación",
+						"datos"		=> "Se eliminará el registro e incrementará el inventario en 1"
+					);
+				}
+
+			}else{
+				$response['mensaje'] = "No se puede ejecutar la acción";
+			}
 			
 		}else{
 			$response['mensaje'] = "Variable Action no Declarada";
