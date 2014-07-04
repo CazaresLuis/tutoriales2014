@@ -36,20 +36,32 @@ if(isset($_POST) && !empty($_POST)){
 
 				if($_POST['inventario'] == 'ok'){
 
-					$disponibilidad = verificaDisponibilidad($mysqli,$_POST['id_registro']);
+					if($disponibilidad = verificaDisponibilidad($mysqli,$_POST['id_registro'])){
 
-					$response = array(
-						"result" 	=> true,
-						"mensaje"	=> "Verificación",
-						"datos"		=> $disponibilidad
-					);
+						if($setRegistro = setRegistro($mysqli,$_POST['id_registro'])){
+
+							if($afectaInventario = setInventario($mysqli, 'restar', $_POST['id_registro'], $disponibilidad['registro_inv'])){
+								
+								$response = array(
+									"result" 	=> true,
+									"mensaje"	=> "Se bloqueó correctamente la charla",
+									"datos"		=> $disponibilidad
+								);
+
+							}else{
+								$response['mensaje'] = "No se pudo afectar el inventario";
+							}
+
+						}else{
+							$response['mensaje'] = "No fue posible guardar el registro";
+						}
+
+					}else{
+						$response['mensaje'] = "No hay disponibilidad en la sala";
+					}
 
 				}else{
-					$response = array(
-						"result" 	=> true,
-						"mensaje"	=> "Verificación",
-						"datos"		=> "Se eliminará el registro e incrementará el inventario en 1"
-					);
+					$response['mensaje'] = "Se eliminará el registro e incrementará el inventario en 1";
 				}
 
 			}else{

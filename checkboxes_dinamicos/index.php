@@ -10,6 +10,8 @@
 session_name('tutorialesCazares2014');
 session_start();
 
+// ini_set("display_errors", 1);
+
 $root = '../';
 
 // Incluimos la inicialización de la clase twig

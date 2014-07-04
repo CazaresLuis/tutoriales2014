@@ -41,10 +41,65 @@ function verificaDisponibilidad($dbLink,$id_registro){
 	$respuesta = $dbLink -> query($consultaOK);
 
 	if($respuesta -> num_rows != 0){
-		$response = true;
+		$response = $respuesta -> fetch_assoc();
 	}
 
 	return $response ;
+}
+
+// llenar pool de platicas
+function setRegistro($dbLink,$id_registro){
+	$response 	= false;
+
+	$consulta 	= "INSERT INTO lista_checkboxes
+				SET id_registro=%d";
+
+	$query		= sprintf($consulta,$id_registro);
+
+	// Ejecutamos la cosnulta
+	$respuesta = $dbLink -> query($query);
+
+	if($dbLink -> affected_rows == 1){
+		$response = true;
+	}
+
+	return $response;
+}
+
+// Actualizar inventario
+function setInventario($dbLink, $accion, $id_registro, $inventario = 0){
+	
+	$response = false;
+
+	// Afectamos el inventario
+	if($inventario != 0){
+		switch ($accion) {
+			case 'sumar':
+				$inventario++;
+			break;
+			case 'restar':
+				$inventario--;
+			break;
+		}
+
+		// Creamos el query
+		$consulta 	= "UPDATE ajax_checkboxes
+					  SET registro_inv=%d
+					  WHERE id_registro=%d
+					  LIMIT 1";
+
+		$query		= sprintf($consulta,$inventario,$id_registro);
+
+		// Ejecutamos la cosnulta
+		$respuesta = $dbLink -> query($query);
+
+		if($dbLink -> affected_rows == 1){
+			$response = true;
+		}
+		
+	}
+
+	return $response;
 }
 
 ?>
