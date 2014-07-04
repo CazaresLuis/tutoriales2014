@@ -49,8 +49,36 @@
     $('body').on('click', '#listaRegistros input[type=checkbox]', function(event) {
 
       var idRegistro = $(this).attr('data-idRegistro');
+      inventario = 'xld';
 
-      alert(idRegistro);
+      if($(this).is(':checked')){
+        inventario  = 'ok';
+      }
+
+      $.ajax({
+        url: 'actions.inc.php',
+        type: 'POST',
+        dataType: 'json',
+        data: "action=setBloqueo&id_registro=" + idRegistro + "&inventario=" + inventario,
+      })
+      .done(function(response) {
+
+        if(response.result == true){
+          alert(response.mensaje)
+        }else{
+          alert(response.mensaje)
+        }
+
+        console.log("success");
+
+      })
+      .fail(function() {
+        console.log("error");
+      })
+      .always(function() {
+        console.log("complete");
+      });
+      
       
     });
   });
