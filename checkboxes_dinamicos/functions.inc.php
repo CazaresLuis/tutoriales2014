@@ -102,4 +102,45 @@ function setInventario($dbLink, $accion, $id_registro, $inventario = 0){
 	return $response;
 }
 
+// Verificar bloqueo de plticas
+function verificaRegistro($dbLink,$id_registro){
+	$response = false;
+
+	$consulta 	= "SELECT id_registro
+				   FROM lista_checkboxes
+				   WHERE id_registro=%d
+				   LIMIT 1";
+
+	$query		= sprintf($consulta,$id_registro);
+
+	// Ejecutamos la consulta
+	$respuesta = $dbLink -> query($query);
+
+	if($respuesta -> num_rows != 0){
+		$response = true;
+	}
+
+	return $response ;
+}
+
+// Eliminar registro
+function eliminaRegistro($dbLink,$id_registro){
+	$response	=	false;
+
+	$consulta 	= "DELETE FROM lista_checkboxes
+				   WHERE id_registro=%d
+				   LIMIT 1";
+
+	$query		= sprintf($consulta,$id_registro);
+
+	// Ejecutamos la consulta
+	$respuesta = $dbLink -> query($query);
+
+	if($dbLink -> affected_rows != 0){
+		$response = true;
+	}
+
+	return $response ;
+}
+
 ?>

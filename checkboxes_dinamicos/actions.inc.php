@@ -11,6 +11,9 @@
 // Será utilizado en caso de requerir alguna librería
 $root = '../';
 
+// sleep
+sleep(3);
+
 // Verificamos si existen las variables $_POST
 if(isset($_POST) && !empty($_POST)){
 
@@ -61,7 +64,26 @@ if(isset($_POST) && !empty($_POST)){
 					}
 
 				}else{
-					$response['mensaje'] = "Se eliminará el registro e incrementará el inventario en 1";
+					// extraemos la disponibilidad
+					$disponibilidad = verificaDisponibilidad($mysqli,$_POST['id_registro']);
+
+					if($registroBaja = eliminaRegistro($mysqli,$_POST['id_registro'])){
+
+						if($afectaInventario = setInventario($mysqli, 'sumar', $_POST['id_registro'], $disponibilidad['registro_inv'])){
+								
+							$response = array(
+								"result" 	=> true,
+								"mensaje"	=> "Se liberó correctamente la charla",
+								"datos"		=> $disponibilidad
+							);
+
+						}else{
+							$response['mensaje'] = "No se pudo afectar el inventario";
+						}
+
+					}else{
+						$response['mensaje'] = "No se puede eliminar el registro";
+					}
 				}
 
 			}else{

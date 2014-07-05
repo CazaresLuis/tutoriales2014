@@ -29,7 +29,13 @@
         <tbody id="listaRegistros">
         {% for registro in registros %}
           <tr>
-            <td><input type="checkbox" data-idRegistro="{{ registro.id_registro }}" name="check_" name="check_" value="1" {{ registro.registro_inv <= 5 ? 'disabled="disabled"' : '' }}></td>
+            <td>
+
+            <img src="wait_bio.gif" alt="" height="15" width="15" class="hide" id="img-{{ registro.id_registro }}">
+
+            <input type="checkbox" data-idRegistro="{{ registro.id_registro }}" name="check_{{ registro.id_registro }}" id="check_{{ registro.id_registro }}" value="1" {{ registro.registro_inv <= 5 ? 'disabled="disabled"' : '' }} {{ registro.bloqueado == true ? 'checked="checked"' : '' }}>
+            
+            </td>
             <td>{{ registro.registro_nombre }} {{ registro.registro_inv <= 5 ? '<span class="label label-warning"><small>agotado</small></span>' : '' }}</td>
           </tr>
         {% endfor %}
@@ -48,7 +54,10 @@
     // al hacer click en los Checkboxes
     $('body').on('click', '#listaRegistros input[type=checkbox]', function(event) {
 
-      var idRegistro = $(this).attr('data-idRegistro');
+      var idRegistro  = $(this).attr('data-idRegistro');
+      var checkOculto = '#check_' + idRegistro;
+      var imgWait     = '#img-' + idRegistro;
+
       inventario = 'xld';
 
       if($(this).is(':checked')){
@@ -60,13 +69,18 @@
         type: 'POST',
         dataType: 'json',
         data: "action=setBloqueo&id_registro=" + idRegistro + "&inventario=" + inventario,
+        beforeSend:function(){
+          $(checkOculto).addClass('hide');
+          $(imgWait).removeClass('hide');
+        }
       })
       .done(function(response) {
 
         if(response.result == true){
-          alert(response.mensaje)
+          alert(response.mensaje);
         }else{
-          alert(response.mensaje)
+          alert(response.mensaje);
+          $(checkOculto).removeAttr('checked');
         }
 
         console.log("success");
@@ -77,6 +91,8 @@
       })
       .always(function() {
         console.log("complete");
+        $(imgWait).addClass('hide');
+        $(checkOculto).removeClass('hide');
       });
       
       

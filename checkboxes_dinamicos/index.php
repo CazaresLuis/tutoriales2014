@@ -27,7 +27,14 @@ include('functions.inc.php');
 $listaRegistros = array();
 
 if($errorDbConexion == true){
+	
 	$listaRegistros = getListaRegistros($mysqli);
+
+	// Verificamos si esta bloqueada la charla
+	foreach ($listaRegistros as $key => $value) {
+		$listaRegistros[$key]['bloqueado']	= verificaRegistro($mysqli,$listaRegistros[$key]['id_registro']);
+	}
+
 }
 
 
